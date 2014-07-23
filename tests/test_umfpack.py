@@ -7,7 +7,7 @@ so the built-in SuperLU solver is tested too, in single precision.
 """
 
 import warnings
-
+import nose
 from numpy import transpose, array, arange
 
 import random
@@ -18,10 +18,7 @@ from scipy.sparse import csc_matrix, dok_matrix, spdiags, SparseEfficiencyWarnin
 
 import scipy
 try:
-    if scipy.version.version < '0.7.0.dev3861':
-        import scipy.linsolve as linsolve
-    else:
-        import scipy.sparse.linalg.dsolve.linsolve as linsolve
+    import scipy.sparse.linalg.dsolve.linsolve as linsolve
 except (ImportError, AttributeError):
     raise ImportError( "Cannot import linsolve!" )
 
@@ -30,10 +27,9 @@ warnings.simplefilter('ignore',SparseEfficiencyWarning)
 import numpy as nm
 try:
     import scikits.umfpack as um
-except (ImportError, AttributeError):
-    _have_umfpack = False
-else:
-    _have_umfpack = um.umfpack._um is not None
+    _have_umfpack = True
+except:
+    raise Exception('UMFPACK library not found.')
     
 # Allow disabling of nose tests if umfpack not present
 # See end of file for application
@@ -46,8 +42,10 @@ class TestSolvers(TestCase):
     def test_solve_complex_without_umfpack(self):
         """Solve: single precision complex"""
         linsolve.use_solver( useUmfpack = False )
-        a = self.a.astype('F')
+        a = self.a
+        a.data = a.data.astype('F',casting='unsafe')
         b = self.b
+        b = b.astype('F')
         x = linsolve.spsolve(a, b)
         #print x
         #print "Error: ", a*x-b
@@ -90,7 +88,7 @@ class TestSolvers(TestCase):
         """Solve with UMFPACK: double precision, sparse rhs"""
         linsolve.use_solver( useUmfpack = True )
         a = self.a.astype('d')
-        b = csc_matrix( self.b )
+        b = csc_matrix( self.b.reshape((5,1)) )
         x = linsolve.spsolve(a, b)
         #print x
         #print "Error: ", a*x-b
@@ -182,9 +180,9 @@ class TestFactorization(TestCase):
         self.real_matrices.append(rand(5,4))
         self.real_matrices.append(rand(4,5))
 
-        self.real_matrices = [csc_matrix(x).astype('d') for x \
+        self.real_matrices = [csc_matrix(x).astype('float') for x \
                 in self.real_matrices]
-        self.complex_matrices = [x.astype(nm.complex128)
+        self.complex_matrices = [x.astype('complex')
                                  for x in self.real_matrices]
 
 # Skip methods if umfpack not present

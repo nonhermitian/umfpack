@@ -1,7 +1,7 @@
 import setuptools
 
 subpackage = 'umfpack'
-version = '5.1.0'
+version = '5.2.0'
 
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.misc_util import Configuration
@@ -28,8 +28,9 @@ def setup_package():
     setup(
         name = 'scikits.' + subpackage,
         version = version,
-        maintainer = "Robert Cimrman",
-        maintainer_email = "robert.cimrman@gmail.com",
+        author = "Robert Cimrman",
+        maintainer = "Paul Nation",
+        maintainer_email = "nonhermitian@gmail.com",
         description = "Python interface to the UMFPACK sparse linear solver.",
         url = "http://www.scipy.org",
         license = 'BSD',
