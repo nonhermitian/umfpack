@@ -1,10 +1,6 @@
-from info import __doc__
+from scikits.umfpack.info import __doc__
 
-from umfpack import *
+from scikits.umfpack.umfpack import *
 
-__all__ = filter(lambda s:not s.startswith('_'),dir())
-try:
-    from scipy.testing.pkgtester import Tester
-except:
-    from numpy.testing import Tester
-test = Tester().test
+__all__ = list(filter(lambda s:not s.startswith('_'),dir()))
+
