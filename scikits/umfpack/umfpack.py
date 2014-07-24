@@ -236,9 +236,9 @@ umfFamilyTypes = {'di': int, 'dl': int, 'zi': int, 'zl': int}
 umfRealTypes = ('di', 'dl')
 umfComplexTypes = ('zi', 'zl')
 
-##
-# 02.01.2005
-
+# Orderings available
+umfOrders = {'COLAMD': 1, 'METIS': 3, 'BEST': 4, 'NATURAL': 5}
+ 
 
 class Struct(object):
     # 03.10.2005, c
@@ -306,7 +306,18 @@ class UmfpackContext(Struct):
         self.funs = Struct(**fn)
 
         self.funs.defaults(self.control)
-        self.control[UMFPACK_PRL] = 3
+        
+        # Set level of verbosity for reports
+        self.control[UMFPACK_PRL] = 4
+        
+        # Allow user to set ordering used using 'ordering' kwarg
+        if 'ordering' in kwargs.keys():
+            if kwargs['ordering'] in umfOrders.keys():
+                self.control[UMFPACK_ORDERING] = umfOrders[kwargs['ordering']]
+            else:
+                raise Exception('Invalid ordering keyword argument.')
+        else:
+            self.control[UMFPACK_ORDERING] = 1 # Default AMD/COLAMD
 
     def __del__(self):
         if _um is not None:
